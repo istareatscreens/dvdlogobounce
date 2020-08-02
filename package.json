@@ -1,0 +1,24 @@
+{
+  "name": "dvdlogobounce",
+  "version": "1.0.0",
+  "description": "DVD logo bounce",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
+  "author": "istareatscreens",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "babel-loader": "^8.1.0",
+    "css-loader": "^4.2.0",
+    "style-loader": "^1.2.1",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
