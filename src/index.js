@@ -1,14 +1,20 @@
+//load canvas element
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+//set initial heigth and width
+ctx.canvas.width = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+
 window.addEventListener("load", dvdAnimate());
+window.addEventListener("resize", resizeCanvas, false);
 
-function dvdAnimate() {
-  //load canvas element
-  const canvas = document.querySelector("canvas");
-  const ctx = canvas.getContext("2d");
-
+function resizeCanvas() {
   //Set canvas size
   ctx.canvas.width = window.innerWidth;
   ctx.canvas.height = window.innerHeight;
+}
 
+function dvdAnimate() {
   let img = new Image(); // Create new img element
   img.src = "./images/dvdVideo.png"; // Set source path
 
@@ -21,7 +27,6 @@ function dvdAnimate() {
   window.requestAnimationFrame(function animateImage() {
     x += vx;
     y += vy;
-    console.log("x: " + x + " y: " + y + "\nvx: " + vx + " vy: " + vy);
     if ((x >= ctx.canvas.width - img.width && vx > 0) || (x <= 0 && vx < 0)) {
       vx = -vx;
     }
@@ -31,10 +36,7 @@ function dvdAnimate() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, x, y);
-    //drawImage(x, y, ctx, img);
     window.requestAnimationFrame(animateImage);
-    //drawImage(x, y, ctx, img);
-    //window.requestAnimationFrame(animateImage(x, y, ctx, canvas, img));
   });
 }
 
