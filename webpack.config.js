@@ -28,6 +28,10 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.wasm$/,
+        loaders: ["wasm-loader"],
+      },
     ],
   },
   resolve: { extensions: ["*", ".js", ".jsx"] },
