@@ -4,8 +4,10 @@
   "description": "DVD logo bounce",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
-    "wasm": "emcc ./src/wasm/movement.c -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MODULARIZE=1 -s EXPORTED_FUNCTIONS=\"['_get_canvas_size', '_get_selection','_change_direction','_update_axis','_get_canvas_size']\" -o ./src/wasm/movement_wasm.js -O3"
+    "serve": "live-server public/",
+    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "wasm": "emcc ./src/wasm/movement.c -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MODULARIZE=1 -s EXPORTED_FUNCTIONS=\"['_get_canvas_size', '_get_selection','_change_direction','_update_axis','_get_canvas_size']\" -o ./src/wasm/movement_wasm.js -O3",
+    "build": "webpack --config webpack.prod.js"
   },
   "author": "istareatscreens",
   "license": "MIT",
@@ -21,7 +23,8 @@
     "wasm-loader": "^1.3.0",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^5.4.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5"
