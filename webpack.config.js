@@ -6,6 +6,9 @@ const webpack = require("webpack");
 module.exports = {
   entry: "./src/index.js",
   mode: "development",
+  node: {
+    fs: 'empty'
+  },
   module: {
     rules: [
       {
@@ -30,8 +33,18 @@ module.exports = {
       },
       {
         test: /\.wasm$/,
-        loaders: ["wasm-loader"],
-      },
+        type:
+          "javascript/auto" /** this disables webpacks default handling of wasm */,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "src/wasm/[name].[hash].[ext]",
+              publicPath: "/dist/"
+            }
+          }
+        ]
+      }
     ],
   },
   resolve: { extensions: ["*", ".js", ".jsx"] },

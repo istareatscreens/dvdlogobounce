@@ -1,20 +1,31 @@
-//load canvas element
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-//set initial heigth and width
-ctx.canvas.width = window.innerWidth;
-ctx.canvas.height = window.innerHeight;
+import { sum } from "./loadwasm.js"
 
-window.addEventListener("load", dvdAnimate());
-window.addEventListener("resize", resizeCanvas, false);
+render();
 
-function resizeCanvas() {
-  //Set canvas size
+async function render() {
+  console.log(await sum(100, 2));
+  console.log(await sum(99, 2));
+  //load canvas element
+  const canvas = document.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  //set initial heigth and width
   ctx.canvas.width = window.innerWidth;
   ctx.canvas.height = window.innerHeight;
+
+  window.addEventListener("load", dvdAnimate(canvas, ctx));
+  window.addEventListener("resize", resizeCanvas(ctx), false);
+
 }
 
-function dvdAnimate() {
+function resizeCanvas(ctx) {
+  //Set canvas size
+  return () => {
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+  }
+}
+
+function dvdAnimate(canvas, ctx) {
   let img = [new Image(), new Image(), new Image()]; // Create new img element
   img[0].src = "./images/dvdVideoR.png"; // Set source path
   img[1].src = "./images/dvdVideoB.png"; // Set source path

@@ -1,7 +1,7 @@
 
 var Module = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
-  
+  if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
 function(Module) {
   Module = Module || {};
@@ -123,9 +123,15 @@ var quit_ = function(status, toThrow) {
 // setting the ENVIRONMENT setting at compile time (see settings.js).
 
 var ENVIRONMENT_IS_WEB = false;
-var ENVIRONMENT_IS_WORKER = true;
+var ENVIRONMENT_IS_WORKER = false;
 var ENVIRONMENT_IS_NODE = false;
 var ENVIRONMENT_IS_SHELL = false;
+ENVIRONMENT_IS_WEB = typeof window === 'object';
+ENVIRONMENT_IS_WORKER = typeof importScripts === 'function';
+// N.b. Electron.js environment is simultaneously a NODE-environment, but
+// also a web environment.
+ENVIRONMENT_IS_NODE = typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string';
+ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 
 if (Module['ENVIRONMENT']) {
   throw new Error('Module.ENVIRONMENT has been deprecated. To force the environment, use the ENVIRONMENT compile-time option (for example, -s ENVIRONMENT=web or -s ENVIRONMENT=node)');
@@ -145,6 +151,99 @@ var read_,
     readAsync,
     readBinary,
     setWindowTitle;
+
+var nodeFS;
+var nodePath;
+
+if (ENVIRONMENT_IS_NODE) {
+  if (ENVIRONMENT_IS_WORKER) {
+    scriptDirectory = require('path').dirname(scriptDirectory) + '/';
+  } else {
+    scriptDirectory = __dirname + '/';
+  }
+
+// include: node_shell_read.js
+
+
+read_ = function shell_read(filename, binary) {
+  if (!nodeFS) nodeFS = require('fs');
+  if (!nodePath) nodePath = require('path');
+  filename = nodePath['normalize'](filename);
+  return nodeFS['readFileSync'](filename, binary ? null : 'utf8');
+};
+
+readBinary = function readBinary(filename) {
+  var ret = read_(filename, true);
+  if (!ret.buffer) {
+    ret = new Uint8Array(ret);
+  }
+  assert(ret.buffer);
+  return ret;
+};
+
+// end include: node_shell_read.js
+  if (process['argv'].length > 1) {
+    thisProgram = process['argv'][1].replace(/\\/g, '/');
+  }
+
+  arguments_ = process['argv'].slice(2);
+
+  // MODULARIZE will export the module in the proper place outside, we don't need to export here
+
+  process['on']('uncaughtException', function(ex) {
+    // suppress ExitStatus exceptions from showing an error
+    if (!(ex instanceof ExitStatus)) {
+      throw ex;
+    }
+  });
+
+  process['on']('unhandledRejection', abort);
+
+  quit_ = function(status) {
+    process['exit'](status);
+  };
+
+  Module['inspect'] = function () { return '[Emscripten Module object]'; };
+
+} else
+if (ENVIRONMENT_IS_SHELL) {
+
+  if (typeof read != 'undefined') {
+    read_ = function shell_read(f) {
+      return read(f);
+    };
+  }
+
+  readBinary = function readBinary(f) {
+    var data;
+    if (typeof readbuffer === 'function') {
+      return new Uint8Array(readbuffer(f));
+    }
+    data = read(f, 'binary');
+    assert(typeof data === 'object');
+    return data;
+  };
+
+  if (typeof scriptArgs != 'undefined') {
+    arguments_ = scriptArgs;
+  } else if (typeof arguments != 'undefined') {
+    arguments_ = arguments;
+  }
+
+  if (typeof quit === 'function') {
+    quit_ = function(status) {
+      quit(status);
+    };
+  }
+
+  if (typeof print !== 'undefined') {
+    // Prefer to use print/printErr where they exist, as they usually work better.
+    if (typeof console === 'undefined') console = /** @type{!Console} */({});
+    console.log = /** @type{!function(this:Console, ...*): undefined} */ (print);
+    console.warn = console.error = /** @type{!function(this:Console, ...*): undefined} */ (typeof printErr !== 'undefined' ? printErr : print);
+  }
+
+} else
 
 // Note that this includes Node.js workers when relevant (pthreads is enabled).
 // Node.js workers are detected as a combination of ENVIRONMENT_IS_WORKER and
@@ -169,8 +268,6 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
   } else {
     scriptDirectory = '';
   }
-
-  if (!(typeof window === 'object' || typeof importScripts === 'function')) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
 
   // Differentiate the Web Worker from the Node Worker case, as reading must
   // be done differently.
@@ -1469,7 +1566,7 @@ function createExportWrapper(name, fixedasm) {
   };
 }
 
-var wasmBinaryFile = 'movement.wasm';
+var wasmBinaryFile = 'movement_wasm.wasm';
 if (!isDataURI(wasmBinaryFile)) {
   wasmBinaryFile = locateFile(wasmBinaryFile);
 }
@@ -1495,6 +1592,8 @@ function getBinaryPromise() {
   // If we don't have the binary yet, and have the Fetch api, use that;
   // in some environments, like Electron's render process, Fetch api may be present, but have a different context than expected, let's only use it on the Web
   if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) && typeof fetch === 'function'
+      // Let's not use fetch to get objects over file:// as it's most likely Cordova which doesn't support fetch for file://
+      && !isFileURI(wasmBinaryFile)
       ) {
     return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
       if (!response['ok']) {
@@ -1563,6 +1662,8 @@ function createWasm() {
     if (!wasmBinary &&
         typeof WebAssembly.instantiateStreaming === 'function' &&
         !isDataURI(wasmBinaryFile) &&
+        // Don't use streaming for file:// delivered objects in a webview, fetch them synchronously.
+        !isFileURI(wasmBinaryFile) &&
         typeof fetch === 'function') {
       return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function (response) {
         var result = WebAssembly.instantiateStreaming(response, info);
@@ -2103,9 +2204,4 @@ run();
 }
 );
 })();
-if (typeof exports === 'object' && typeof module === 'object')
-  module.exports = Module;
-else if (typeof define === 'function' && define['amd'])
-  define([], function() { return Module; });
-else if (typeof exports === 'object')
-  exports["Module"] = Module;
+export default Module;

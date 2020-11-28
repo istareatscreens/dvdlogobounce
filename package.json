@@ -4,22 +4,28 @@
   "description": "DVD logo bounce",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "wasm": "emcc ./src/wasm/movement.cpp -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MODULARIZE=1 -s EXPORTED_FUNCTIONS=\"['_add' ]\" -o ./src/wasm/movement_wasm.js"
   },
   "author": "istareatscreens",
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.0",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.2.2",
     "css-loader": "^4.3.0",
-    "file-loader": "^6.0.0",
+    "file-loader": "^6.2.0",
     "style-loader": "^1.3.0",
     "wasm-loader": "^1.3.0",
-    "webpack": "^4.44.1",
+    "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "worker-loader": "^3.0.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@babel/runtime": "^7.12.5",
+    "comlink": "^4.3.0"
+  }
 }
