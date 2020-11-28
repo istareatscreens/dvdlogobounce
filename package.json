@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "wasm": "emcc ./src/wasm/movement.cpp -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MODULARIZE=1 -s EXPORTED_FUNCTIONS=\"['_add' ]\" -o ./src/wasm/movement_wasm.js"
+    "wasm": "emcc ./src/wasm/movement.c -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MODULARIZE=1 -s EXPORTED_FUNCTIONS=\"['_get_canvas_size', '_get_selection','_change_direction','_update_axis','_get_canvas_size']\" -o ./src/wasm/movement_wasm.js -O3"
   },
   "author": "istareatscreens",
   "license": "MIT",

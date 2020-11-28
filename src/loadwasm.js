@@ -1,13 +1,13 @@
-import Module from "./wasm/movement_wasm.js";
-import addWasm from "./wasm/movement_wasm.wasm";
+import module from "./wasm/movement_wasm.js";
+import wasmFile from "./wasm/movement_wasm.wasm";
 
-export const sum = async (a, b) =>
+export const wasmFunctions = async (a, b) =>
     new Promise(async resolve => {
-        const wasm = await fetch(addWasm);
+        const wasm = await fetch(wasmFile);
         const buffer = await wasm.arrayBuffer();
-        const _instance = await Module({
+        const _instance = await module({
             wasmBinary: buffer
         });
 
-        return resolve(_instance._add(a, b))
+        return resolve(await _instance)
     });
