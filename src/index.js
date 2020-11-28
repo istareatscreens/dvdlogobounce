@@ -1,5 +1,7 @@
 import { wasmFunctions } from "./loadwasm.js"
 
+let resizeRatio = 2;
+
 render();
 
 async function render() {
@@ -42,8 +44,15 @@ async function dvdAnimate(canvas, ctx) {
     //calculate screen width and height
     let selection = 0;
     let { _get_selection, _get_canvas_size, _change_direction, _update_axis } = movementFunctions;
-    let widthDimension = _get_canvas_size(ctx.canvas.width, img[selection].width);
-    let heightDimension = _get_canvas_size(ctx.canvas.height, img[selection].height);
+
+
+    if (img[selection].height / ctx.canvas.height > 0.25 || img[selection].width / ctx.canvas.width > 0.25) {
+      resizeRatio = (img[selection].height / ctx.canvas.height > img[selection].width / ctx.canvas.width) ? 1 - img[selection].height / ctx.canvas.height : 1 - img[selection].width / ctx.canvas.width;
+      if (resizeRatio < 0.25) resizeRatio = 0.25;
+    }
+
+    let widthDimension = _get_canvas_size(ctx.canvas.width, img[selection].width * resizeRatio);
+    let heightDimension = _get_canvas_size(ctx.canvas.height, img[selection].height * resizeRatio);
 
     x = _update_axis(x, vx, widthDimension);
     selection = _get_selection(selection, x, vx);
@@ -53,16 +62,16 @@ async function dvdAnimate(canvas, ctx) {
     vy = await _change_direction(y, vy, heightDimension);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.drawImage(img[selection], x, y);
+    ctx.drawImage(img[selection], x, y, img[selection].width * resizeRatio, img[selection].height * resizeRatio);
     window.requestAnimationFrame(animateImage);
   });
 }
 
-function drawImage(x, y, ctx, img) {
+function drawImage(x, y, ctx, img, width, height) {
   img.addEventListener(
     "load",
     function () {
-      ctx.drawImage(img, x, y);
+      ctx.drawImage(img, x, y, width, height);
     },
     false
   );
