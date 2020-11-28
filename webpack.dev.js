@@ -5,7 +5,6 @@ const path = require("path");
 
 module.exports = merge(common, {
   mode: "development",
-  node: { fs: "empty" },
   devServer: {
     contentBase: path.join(__dirname, "public/")
   },
