@@ -36,7 +36,7 @@ module.exports = {
                     {
                         loader: "file-loader",
                         options: {
-                            name: "src/wasm/[name].[hash].[ext]",
+                            name: "[name].[hash].[ext]",
                             publicPath: "/dist/"
                         }
                     }
