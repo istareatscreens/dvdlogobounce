@@ -2,6 +2,9 @@
 
 const path = require("path");
 const webpack = require("webpack");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 
 module.exports = {
     entry: "./src/index.js",
@@ -19,14 +22,8 @@ module.exports = {
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: {
-                            outputPath: "images",
-                        },
-                    },
-                ],
+                loader: 'file-loader',
+                options: { name: '[name].[ext]?[hash]' },
             },
             {
                 test: /\.wasm$/,
@@ -50,4 +47,12 @@ module.exports = {
         publicPath: "/dist/",
         filename: "bundle.js",
     },
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+
+            title: 'Output Management',
+
+        })
+    ]
 };

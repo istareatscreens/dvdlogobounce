@@ -1,5 +1,9 @@
 import { wasmFunctions } from "./loadwasm.js"
 
+import logoR from "../public/images/dvdVideoR.png";
+import logoB from "../public/images/dvdVideoB.png";
+import logoG from "../public/images/dvdVideoG.png";
+
 let resizeRatio = 2;
 
 render();
@@ -27,9 +31,10 @@ function resizeCanvas(ctx) {
 
 async function dvdAnimate(canvas, ctx) {
   let img = [new Image(), new Image(), new Image()]; // Create new img element
-  img[0].src = "./images/dvdVideoR.png"; // Set source path
-  img[1].src = "./images/dvdVideoB.png"; // Set source path
-  img[2].src = "./images/dvdVideoG.png"; // Set source path
+  console.log(logoR);
+  img[0].src = logoR; // Set source path
+  img[1].src = logoB; // Set source path
+  img[2].src = logoG; // Set source path
 
   //load wasm functions
   let movementFunctions = await wasmFunctions();
