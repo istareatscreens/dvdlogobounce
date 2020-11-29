@@ -31,7 +31,6 @@ function resizeCanvas(ctx) {
 
 async function dvdAnimate(canvas, ctx) {
   let img = [new Image(), new Image(), new Image()]; // Create new img element
-  console.log(logoR);
   img[0].src = logoR; // Set source path
   img[1].src = logoB; // Set source path
   img[2].src = logoG; // Set source path

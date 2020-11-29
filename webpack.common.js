@@ -3,14 +3,17 @@
 const path = require("path");
 const webpack = require("webpack");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-
 
 module.exports = {
     entry: "./src/index.js",
     node: { fs: "empty" },
     module: {
         rules: [
+            {
+                test: /\.html$/i,
+                loader: 'html-loader',
+                options: { name: '[name].[ext]?[hash]' },
+            },
             {
                 test: /\.(js|jsx)$/,
                 exclude: /(node_modules)/,
@@ -22,7 +25,7 @@ module.exports = {
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/,
-                loader: 'file-loader',
+                loader: 'url-loader',
                 options: { name: '[name].[ext]?[hash]' },
             },
             {
@@ -43,16 +46,11 @@ module.exports = {
     },
     resolve: { extensions: ["*", ".js", ".jsx"] },
     output: {
-        path: path.resolve(__dirname, "dist/"),
+        path: path.resolve(__dirname, "public/dist/"),
         publicPath: "/dist/",
         filename: "bundle.js",
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-
-            title: 'Output Management',
-
-        })
     ]
 };
