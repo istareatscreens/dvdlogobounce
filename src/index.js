@@ -73,9 +73,13 @@ async function dvdAnimate(canvas, ctx) {
     vy = _change_direction(y, vy, heightDimension);
 
     if (prevSelection !== selection && frames < 50) {
-      const temp = img[selection];
+      let temp = img[selection];
       img[selection] = img[prevSelection];
       img[prevSelection] = temp;
+
+      temp = imgFav[selection];
+      imgFav[selection] = imgFav[prevSelection];
+      imgFav[prevSelection] = temp;
     }
 
     if (prevSelection !== selection) {
