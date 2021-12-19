@@ -15,3 +15,6 @@ coverage
 nyc
 *.lcov
 
+# ide
+.devcontainer
+.vscode

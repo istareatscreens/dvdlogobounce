@@ -1,8 +1,13 @@
 import { wasmFunctions } from "./loadwasm.js"
+import changeFavicon from "./changeFavicon.js";
 
 import logoR from "../public/images/dvdVideoR.png";
 import logoB from "../public/images/dvdVideoB.png";
 import logoG from "../public/images/dvdVideoG.png";
+
+import favR from "../public/images/faviconr.png";
+import favB from "../public/images/faviconb.png";
+import favG from "../public/images/favicong.png";
 
 let resizeRatio = 2;
 
@@ -35,6 +40,13 @@ async function dvdAnimate(canvas, ctx) {
   img[1].src = logoB; // Set source path
   img[2].src = logoG; // Set source path
 
+  let base_url = window.location.origin;
+  let imgFav = [
+    base_url + "/images/faviconr.png",
+    base_url + "/images/faviconb.png",
+    base_url + "/images/favicong.png"
+  ]
+
   //load wasm functions
   let movementFunctions = await wasmFunctions();
 
@@ -64,6 +76,8 @@ async function dvdAnimate(canvas, ctx) {
     selection = await _get_selection(selection, y, vy);
     vx = await _change_direction(x, vx, widthDimension);
     vy = await _change_direction(y, vy, heightDimension);
+    //console.log(imgFav[selection]
+    changeFavicon(imgFav[selection]);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(img[selection], x, y, img[selection].width * resizeRatio, img[selection].height * resizeRatio);
