@@ -55,11 +55,6 @@ async function dvdAnimate(canvas, ctx) {
     let { _get_selection, _get_canvas_size, _change_direction, _update_axis, _get_resize_ratio } = movementFunctions;
     let selection = 0;
 
-    if (img[selection].height / ctx.canvas.height > 0.25 || img[selection].width / ctx.canvas.width > 0.25) {
-      resizeRatio = (img[selection].height / ctx.canvas.height > img[selection].width / ctx.canvas.width) ? 1 - img[selection].height / ctx.canvas.height : 1 - img[selection].width / ctx.canvas.width;
-      if (resizeRatio < 0.25) resizeRatio = 0.25;
-    }
-
     let resizeRatio = _get_resize_ratio(img[selection].width, img[selection].height, ctx.canvas.height, ctx.canvas.width);
 
     let widthDimension = _get_canvas_size(ctx.canvas.width, img[selection].width * resizeRatio);
