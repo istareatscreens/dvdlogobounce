@@ -1,15 +1,17 @@
-// source: https://stackoverflow.com/questions/260857/changing-website-favicon-dynamically
-export default function changeFavicon(link) {
-    let $favicon = document.querySelector('link[rel="icon"]')
-    // If a <link rel="icon"> element already exists,
-    // change its href to the given link.
-    if ($favicon !== null) {
-        $favicon.href = link
-        // Otherwise, create a new element and append it to <head>.
-    } else {
-        $favicon = document.createElement("link")
-        $favicon.rel = "icon"
-        $favicon.href = link
-        document.head.appendChild($favicon)
+function changeFavicon(link) {
+    const absoluteLink = new URL(link, document.baseURI).href;
+    let $favicon = document.querySelector('link[rel="icon"]');
+    
+    if ($favicon && $favicon.href === absoluteLink) {
+        return;
     }
+    
+    if (!$favicon) {
+        $favicon = document.createElement("link");
+        $favicon.rel = "icon";
+        $favicon.id = "favicon";
+        document.head.appendChild($favicon);
+    }
+    
+    $favicon.href = absoluteLink;
 }
