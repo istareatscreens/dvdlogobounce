@@ -1,17 +1,18 @@
 export default function changeFavicon(link) {
-    let favicon = document.querySelector('link[rel="icon"]');
-    const absoluteLink = new URL(link, document.baseURI).href;
+    try {
+        const absoluteLink = new URL(link, document.baseURI).href;
 
-    if (favicon && favicon.href === absoluteLink) {
-        return;
+        let favicon = document.querySelector('link[rel="icon"]');
+
+        if (!favicon) {
+            favicon = document.createElement("link");
+            favicon.rel = "icon";
+            favicon.id = "favicon";
+            document.head.appendChild(favicon);
+        }
+
+        favicon.href = absoluteLink;
+    } catch (error) {
+        setTimeout(() => changeFavicon(), 1000);
     }
-
-    if (!favicon) {
-        favicon = document.createElement("link");
-        favicon.rel = "icon";
-        favicon.id = "favicon";
-        document.head.appendChild(favicon);
-    }
-
-    favicon.href = link;
 }

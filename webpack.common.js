@@ -16,7 +16,7 @@ module.exports = {
                 loader: "babel-loader",
             },
             {
-                test: /\.(png|jpe?g|gif|svg)$/i,
+                test: /\.(png|jpe?g|gif|svg|ico)$/i,
                 loader: 'url-loader',
                 options: {
                     limit: 8192,
@@ -46,7 +46,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
-            favicon: './assets/faviconr.png',
+            favicon: './assets/dvdVideoR.ico',
             inject: true,
         }),
         new CleanWebpackPlugin(),

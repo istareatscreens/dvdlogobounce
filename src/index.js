@@ -1,28 +1,52 @@
 import './styles.css';
 
-import { wasmFunctions } from "./loadwasm.js"
+import { loadWasm, getWasmInstance, isWasmLoaded } from './loadwasm.js';
 import changeFavicon from "./changeFavicon.js";
 
-import logoR from "../assets/dvdVideoR.png";
-import logoB from "../assets/dvdVideoB.png";
-import logoG from "../assets/dvdVideoG.png";
+import { areImagesLoaded, getImages, loadImages } from './loadImages.js';
+import { areFaviconsLoaded, getFavIconSet, loadFavicons } from './loadFavIcons.js';
 
-import faviconR from '../assets/faviconr.png';
-import faviconB from '../assets/faviconb.png';
-import faviconG from '../assets/favicong.png';
+(async function start() {
+  try {
+    hideSpinner();
+    await loadWasm();
+    await loadFavicons();
+    await loadImages();
 
-render();
+    if (
+      !areImagesLoaded() ||
+      !areFaviconsLoaded() ||
+      !isWasmLoaded()
+    ) {
+      throw error;
+    }
 
-async function render() {
+    await render();
+  } catch {
+    showSpinner();
+    setTimeout(() => start(), 3000)
+  }
+})();
+
+function hideSpinner() {
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = 'none';
+}
+
+function showSpinner() {
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = 'block';
+}
+
+async function render(movementFunctions) {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   //set initial heigth and width
   ctx.canvas.width = window.innerWidth;
   ctx.canvas.height = window.innerHeight;
 
-  window.addEventListener("load", dvdAnimate(canvas, ctx));
   window.addEventListener("resize", resizeCanvas(ctx), false);
-
+  dvdAnimate(canvas, ctx);
 }
 
 function resizeCanvas(ctx) {
@@ -34,46 +58,31 @@ function resizeCanvas(ctx) {
 }
 
 async function dvdAnimate(canvas, ctx) {
-  const logoSources = [logoR, logoB, logoG];
-  const img = logoSources.map(src => {
-    const image = new Image();
-    image.src = src;
-    return image;
-  });
-  for (let image of img) {
-    await new Promise(resolve => {
-      image.onload = resolve;
-    });
+  const dvdImages = getImages();
+  const favIcons = getFavIconSet();
+
+  if (
+    dvdImages.length === 0 ||
+    favIcons.length === 0
+  ) {
+    throw error;
   }
 
-  const imgFav = [faviconR, faviconB, faviconG];
-
-  imgFav.forEach(src => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = src;
-    document.head.appendChild(link);
-  });
-
-  //load wasm functions
-  let movementFunctions = await wasmFunctions();
-
   //Set initial position
-  let x = random(0, ctx.canvas.width - img[0].width);
-  let y = random(0, ctx.canvas.height - img[0].height);
+  let x = random(0, ctx.canvas.width - dvdImages[0].width);
+  let y = random(0, ctx.canvas.height - dvdImages[0].height);
   let vy = 3;
   let vx = 3;
 
   window.requestAnimationFrame(async function animateImage(frames = 0, prevSelection = 0) {
     //calculate screen width and height
-    let { _get_selection, _get_canvas_size, _change_direction, _update_axis, _get_resize_ratio } = movementFunctions;
+    let { _get_selection, _get_canvas_size, _change_direction, _update_axis, _get_resize_ratio } = getWasmInstance();
     let selection = 0;
 
-    let resizeRatio = _get_resize_ratio(img[selection].width, img[selection].height, ctx.canvas.height, ctx.canvas.width);
+    let resizeRatio = _get_resize_ratio(dvdImages[selection].width, dvdImages[selection].height, ctx.canvas.height, ctx.canvas.width);
 
-    let widthDimension = _get_canvas_size(ctx.canvas.width, img[selection].width * resizeRatio);
-    let heightDimension = _get_canvas_size(ctx.canvas.height, img[selection].height * resizeRatio);
+    let widthDimension = _get_canvas_size(ctx.canvas.width, dvdImages[selection].width * resizeRatio);
+    let heightDimension = _get_canvas_size(ctx.canvas.height, dvdImages[selection].height * resizeRatio);
 
     x = _update_axis(x, vx, widthDimension);
     selection = _get_selection(selection, x, vx, frames);
@@ -83,23 +92,23 @@ async function dvdAnimate(canvas, ctx) {
     vy = _change_direction(y, vy, heightDimension);
 
     if (prevSelection !== selection && frames < 50) {
-      let temp = img[selection];
-      img[selection] = img[prevSelection];
-      img[prevSelection] = temp;
+      let temp = dvdImages[selection];
+      dvdImages[selection] = dvdImages[prevSelection];
+      dvdImages[prevSelection] = temp;
 
-      temp = imgFav[selection];
-      imgFav[selection] = imgFav[prevSelection];
-      imgFav[prevSelection] = temp;
+      temp = favIcons[selection];
+      favIcons[selection] = favIcons[prevSelection];
+      favIcons[prevSelection] = temp;
     }
 
     if (prevSelection !== selection) {
       frames = 0;
     }
 
-    changeFavicon(imgFav[selection]);
+    changeFavicon(favIcons[selection]);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.drawImage(img[selection], x, y, img[selection].width * resizeRatio, img[selection].height * resizeRatio);
+    ctx.drawImage(dvdImages[selection], x, y, dvdImages[selection].width * resizeRatio, dvdImages[selection].height * resizeRatio);
     window.requestAnimationFrame(() => animateImage(frames + 1, selection));
   });
 }
