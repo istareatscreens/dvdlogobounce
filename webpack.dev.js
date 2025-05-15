@@ -8,5 +8,13 @@ module.exports = merge(common, {
   devServer: {
     contentBase: path.join(__dirname, "public/")
   },
+  module: {
+    rules: [
+      {
+        test: /\.s?css$/,
+        use: ["style-loader", "css-loader"]
+      }
+    ]
+  }
 
 });

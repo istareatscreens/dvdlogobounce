@@ -1,14 +1,19 @@
+import './styles.css';
+
 import { wasmFunctions } from "./loadwasm.js"
 import changeFavicon from "./changeFavicon.js";
 
-import logoR from "./assets/images/dvdVideoR.png";
-import logoB from "./assets/images/dvdVideoB.png";
-import logoG from "./assets/images/dvdVideoG.png";
+import logoR from "../assets/dvdVideoR.png";
+import logoB from "../assets/dvdVideoB.png";
+import logoG from "../assets/dvdVideoG.png";
+
+import faviconR from '../assets/faviconr.png';
+import faviconB from '../assets/faviconb.png';
+import faviconG from '../assets/favicong.png';
 
 render();
 
 async function render() {
-
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   //set initial heigth and width
@@ -29,17 +34,27 @@ function resizeCanvas(ctx) {
 }
 
 async function dvdAnimate(canvas, ctx) {
-  let img = [new Image(), new Image(), new Image()]; // Create new img element
-  img[0].src = logoR; // Set source path
-  img[1].src = logoB; // Set source path
-  img[2].src = logoG; // Set source path
+  const logoSources = [logoR, logoB, logoG];
+  const img = logoSources.map(src => {
+    const image = new Image();
+    image.src = src;
+    return image;
+  });
+  for (let image of img) {
+    await new Promise(resolve => {
+      image.onload = resolve;
+    });
+  }
 
-  let base_url = window.location.origin;
-  let imgFav = [
-    base_url + "/images/faviconr.png",
-    base_url + "/images/faviconb.png",
-    base_url + "/images/favicong.png"
-  ]
+  const imgFav = [faviconR, faviconB, faviconG];
+
+  imgFav.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
 
   //load wasm functions
   let movementFunctions = await wasmFunctions();

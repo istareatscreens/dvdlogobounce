@@ -1,17 +1,17 @@
-function changeFavicon(link) {
+export default function changeFavicon(link) {
+    let favicon = document.querySelector('link[rel="icon"]');
     const absoluteLink = new URL(link, document.baseURI).href;
-    let $favicon = document.querySelector('link[rel="icon"]');
-    
-    if ($favicon && $favicon.href === absoluteLink) {
+
+    if (favicon && favicon.href === absoluteLink) {
         return;
     }
-    
-    if (!$favicon) {
-        $favicon = document.createElement("link");
-        $favicon.rel = "icon";
-        $favicon.id = "favicon";
-        document.head.appendChild($favicon);
+
+    if (!favicon) {
+        favicon = document.createElement("link");
+        favicon.rel = "icon";
+        favicon.id = "favicon";
+        document.head.appendChild(favicon);
     }
-    
-    $favicon.href = absoluteLink;
+
+    favicon.href = link;
 }
