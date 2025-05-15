@@ -1,9 +1,9 @@
 import { wasmFunctions } from "./loadwasm.js"
 import changeFavicon from "./changeFavicon.js";
 
-import logoR from "../public/images/dvdVideoR.png";
-import logoB from "../public/images/dvdVideoB.png";
-import logoG from "../public/images/dvdVideoG.png";
+import logoR from "./assets/images/dvdVideoR.png";
+import logoB from "./assets/images/dvdVideoB.png";
+import logoG from "./assets/images/dvdVideoG.png";
 
 render();
 
