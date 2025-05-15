@@ -1,0 +1,8 @@
+/images/faviconr.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/favicong.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/faviconb.png
+  Cache-Control: public, max-age=31536000, immutable
