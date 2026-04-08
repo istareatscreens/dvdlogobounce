@@ -20,7 +20,7 @@ module.exports = {
                 loader: 'url-loader',
                 options: {
                     limit: 8192,
-                    name: 'assets/[name].[hash].[ext]',
+                    name: 'assets/[name].[ext]',
                 },
             },
             {
@@ -30,7 +30,7 @@ module.exports = {
                     {
                         loader: "file-loader",
                         options: {
-                            name: "wasm/[name].[hash].[ext]",
+                            name: "wasm/[name].[ext]",
                         },
                     },
                 ],

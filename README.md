@@ -1,8 +1,8 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/5cb44389-f5e0-4907-ac9e-d290a50c0c79/deploy-status)](https://app.netlify.com/sites/dvdlogobounce/deploys)
+# DVD Bounce
 
-[DVD BOUNCE](https://dvdlogobounce.netlify.app/)
+[DVD BOUNCE](https://dvd.isas.dev)
 
-# Compile WASM
+## Compile WASM
 
 Pull the [emscripten image](https://hub.docker.com/r/emscripten/emsdk) then to compile wasm run:
 ```
